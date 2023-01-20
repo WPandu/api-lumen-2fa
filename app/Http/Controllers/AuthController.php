@@ -31,6 +31,7 @@ class AuthController extends Controller
 
         if (!$result['access_token']) {
             return $this->setStatusCode(401)->respond([
+                'error_code' => $result['error_code'],
                 'errors' => [
                     $result['message'],
                 ],
