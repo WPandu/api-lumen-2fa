@@ -29,7 +29,6 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'updated_by',
         'active_at',
         'photo',
-        'last_token',
     ];
 
     /**
