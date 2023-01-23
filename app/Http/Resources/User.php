@@ -19,7 +19,6 @@ class User extends JsonResource
             'is_active' => $this->is_active,
             'photo_url' => $this->photo_url,
             'address' => new UserAddress($this->addresses()->primary()->first()),
-            'profile' => new UserProfile($this->profile ?? null),
             'addresses' => UserAddress::collection($this->addresses),
             'roles' => UserRole::collection($this->roles),
             'created_at' => $this->created_at?->toIso8601String(),
