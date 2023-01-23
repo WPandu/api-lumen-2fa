@@ -46,9 +46,11 @@ class AuthService
         $email = $request->input('email');
         $password = $request->input('password');
         $user = User::where('email', $email)->first();
+        $otp = $request->input('otp');
 
         if (is_null($user)) {
             return [
+                'error_code' => 'EMAIL_NOT_FOUND',
                 'message' => trans('validation.email_not_found'),
                 'access_token' => null,
             ];
@@ -61,6 +63,7 @@ class AuthService
 
         if (! $token) {
             return [
+                'error_code' => 'WRONG_EMAIL_PASSWORD',
                 'message' => trans('validation.wrong_email_password'),
                 'access_token' => null,
             ];
@@ -68,7 +71,18 @@ class AuthService
 
         if (!$user->is_active) {
             return [
+                'error_code' => 'USER_INACTIVE',
                 'message' => trans('validation.user_not_active'),
+                'access_token' => null,
+            ];
+        }
+
+        if ($user->google2fa_secret && !$otp) {
+            JWTAuth::setToken($token)->invalidate();
+
+            return [
+                'error_code' => 'NEED_OTP',
+                'message' => 'You must insert OTP',
                 'access_token' => null,
             ];
         }
@@ -87,20 +101,12 @@ class AuthService
         }
 
         if ($user->google2fa_secret) {
-            $otp = $request->input('otp');
-
-            if (!$otp) {
-                return [
-                    'message' => 'You must insert OTP',
-                    'access_token' => null,
-                ];
-            }
-
             $google2fa = new Google2FA;
             $checkOTP = $google2fa->verifyKey($user->google2fa_secret, $otp);
 
             if (!$checkOTP) {
                 return [
+                    'error_code' => 'OTP_INVALID',
                     'message' => 'OTP Invalid',
                     'access_token' => null,
                 ];
