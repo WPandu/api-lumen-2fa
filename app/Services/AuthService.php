@@ -87,19 +87,6 @@ class AuthService
             ];
         }
 
-        //Logout Last Token
-        if ($user->last_token) {
-            try {
-                JWTAuth::setToken($user->last_token)->invalidate();
-            //phpcs:ignore
-            } catch (TokenExpiredException $e) {
-                $user->last_token = null;
-            //phpcs:ignore
-            } catch (TokenInvalidException $e) {
-                $user->last_token = null;
-            }
-        }
-
         if ($user->google2fa_secret) {
             $google2fa = new Google2FA;
             $checkOTP = $google2fa->verifyKey($user->google2fa_secret, $otp);
@@ -112,10 +99,6 @@ class AuthService
                 ];
             }
         }
-
-        //Update Last Token
-        $user->last_token = $token;
-        $user->save();
 
         return [
             'access_token' => $token,

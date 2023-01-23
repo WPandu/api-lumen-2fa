@@ -21,7 +21,6 @@ return new class extends Migration
             $table->string('password');
             $table->boolean('is_active')->default(true);
             $table->text('google2fa_secret')->nullable();
-            $table->text('last_token')->nullable();
             $table->string('activation_token')->nullable();
             $table->string('reset_token')->nullable();
             $table->uuid('created_by')->nullable();
